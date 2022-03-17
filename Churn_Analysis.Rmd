@@ -1,0 +1,184 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r, message=FALSE}
+rm(list=ls())
+library(readxl)
+library(Hmisc)
+library(MASS)
+library(caret)
+library(regclass)
+library(ISLR)
+library(boot)
+library(vcd)
+library(pROC)
+library (ROCR)
+library(readxl)
+```
+
+#### Reading the data
+
+```{r}
+ass3_data <- readxl::read_excel("Assignment3HW3_Data.xlsx", sheet="Data 3")
+data <- data.frame(ass3_data[,c(2, 5:8)])
+colnames(data) <- c("Customer ID", "Customer_Age", "Joined", "Churned", "Avg_Spend")
+head(data)
+```
+
+#### Summary of the data
+
+```{r}
+summary(data)
+```
+
+#### Running the logistic regression
+
+```{r}
+mylogit<-glm(Churned ~ Avg_Spend + Customer_Age + Joined, 
+             data=data, 
+             family = binomial(link="logit")
+             )
+```
+
+##### Displaying the co-efficients
+
+```{r}
+summary(mylogit)
+```
+
+#### Displaying the odds ratio
+
+```{r, message = FALSE}
+oddsr=round(exp(cbind(OddsRatio=coef(mylogit),confint(mylogit))),4)
+oddsr
+```
+
+#### Plotting the confusion matrix
+
+```{r}
+confmat<-confusion_matrix(mylogit) 
+confmat
+#Predict True/False Positive/Negative (TP,TN,FP.FN)
+#the confmat shows in a different order than the slides, so re-ordering.
+#oldconfmat=confmat
+#oldconfmat
+confmat=t(confmat) 
+n_o=c(2,1,3) #new order for better comparison
+confmat <- confmat[n_o,n_o]
+confmat
+```
+
+#### Predicting the probabilities
+
+```{r}
+predict_prob <- predict(mylogit,
+                        newdata = data,
+                        type="response")
+data$pred_churn = predict_prob
+data$retention = 1- predict_prob
+head(data)
+```
+
+#### Plotting the ROC
+
+```{r}
+roc(data$Churned,mylogit$fitted.values, plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="FP Rate", ylab="TP Rate",print.auc=TRUE)
+```
+
+#### Calculating the evaluation metrics of the model
+
+```{r}
+TP <- confmat[1,1]
+FP <- confmat[1,2]
+TN <- confmat[2,2]
+FN <- confmat[2,1]
+
+precision <- TP*100/(TP+FP)
+round(precision, 2)
+
+recall <- TP*100/(TP+FN)
+round(recall, 2)
+
+F1_score <- 2*precision*recall/(precision + recall)
+round(F1_score, 2)
+```
+
+
+#### Adding the margin
+
+```{r}
+data$margin = data$Avg_Spend * 0.5
+head(data)
+```
+
+#### Calculating the CLV
+
+```{r}
+i = 0.0010728
+
+data$clv = data$margin * (1 + i)/(1 + i - data$retention)
+head(data)
+```
+
+#### Average retention rate, margin, lifetime and clv
+
+```{r, message=FALSE}
+library(dplyr)
+online_cust = data %>% filter (Joined == 1)
+
+online_avg_retention = mean(online_cust$retention)
+online_avg_retention
+
+online_avg_margin = mean(online_cust$margin)
+online_avg_margin
+
+online_avg_clv = mean(online_cust$clv)
+online_avg_clv
+
+not_online_cust = data %>% filter (Joined == 0)
+
+not_online_avg_retention = mean(not_online_cust$retention)
+not_online_avg_retention
+
+not_online_avg_margin = mean(not_online_cust$margin)
+not_online_avg_margin
+
+not_online_avg_clv = mean(not_online_cust$clv)
+not_online_avg_clv
+```
+
+#### Using t-test to get point estimate for change in retention
+
+```{r}
+online_retention <- online_cust$retention
+non_online_retention <- not_online_cust$retention
+
+var.test(online_retention,
+         non_online_retention,
+         alternative = "two.sided")
+
+t.test(online_retention,
+       non_online_retention,
+       var.equal = TRUE,
+       alternative = "less")
+```
+
+#### Using t-test to check difference in CLV for online vs not online customers
+
+```{r}
+online_clv <- online_cust$clv
+non_online_clv <- not_online_cust$clv
+
+var.test(online_clv,
+         non_online_clv,
+         alternative="two.sided")
+
+t.test(online_clv,
+       non_online_clv,
+       var.equal = FALSE,
+       alternative = "greater")
+```
