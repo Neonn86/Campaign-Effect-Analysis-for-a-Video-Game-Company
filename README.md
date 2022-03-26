@@ -29,7 +29,7 @@ We use **logistic regression** to estimate the customer churn.
 - For CLV, using the **two-sample t-test**, there is no statistically significant difference between join the campaign or not.
 
 ### 3. The effect of mode of customer acquisition
-- Using , obtain that acquisition method's indepence to other predictors.
+- Using two-sided t-test and two-sided F-test, we confirm that acquisition method's indepence to other predictors.
 
 <img width="500" alt="Screen Shot 2022-03-26 at 4 35 42 PM" src="https://user-images.githubusercontent.com/98130185/160260541-4a06a07d-7d51-433a-b7b0-f54a887e9985.png">
 
@@ -43,4 +43,4 @@ After confirm the independence, form the new **logistic regression** and calcula
 
 - The method of customer acquisition has no statistically significant impact on churn and also other predictors.
 
-***Since there are no significant differences between organic and inorganic users, the retention efforts need not be bifurcated based on method of acquisition.***
+***In other words, since there are no significant differences between organic and inorganic users, the retention efforts need not be bifurcated based on method of acquisition.***
