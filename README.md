@@ -1,6 +1,8 @@
 # Online Campaign Effect Analysis for a Video Game Company
 ## Objective
-Online communities are perceived as a way to increase user engagement in video games. The goal is to examine the effect of the online community by statistically evaluating its impact on metrics such as revenue, retention and Customer Lifetime Value (CLV).
+Online communities are perceived as a way to increase user engagement in video games. 
+
+The goal is to examine the effect of the online community by statistically evaluating its impact on metrics such as **revenue, retention and Customer Lifetime Value (CLV).**
 
 ## Data
 -  Users' spending before and after the introduction of the online community.
