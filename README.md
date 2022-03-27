@@ -4,9 +4,6 @@ The goal is to examine the effect of online community by evaluating its impact o
 
 ## Structure
 ### 1. Evaluate the change in revenue
-- Split the user spend data into two groups, those who were invited to participate the online community and those who were not.
-- Split into two time periods, the month before the introduction of the online community and the month after.
-
 Using the **diff-in-diff model**, we found that joining the online community resulted in a statistically significant increase in spend of $29.02.
 
 ### 2. Estimate the customer churn
